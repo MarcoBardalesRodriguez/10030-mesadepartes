@@ -1,14 +1,13 @@
 const { app, ipcMain } = require('electron')
-const { createWindow } = require('./main/main')
+const { createWindow } = require('./src/main/main')
 
 const path = require('path')
-const pathIndex = path.join(__dirname, 'renderer', 'index.html')
+const pathIndex = path.join(__dirname, 'index.html')
 
-const { initDatabase } = require('./main/Model/init_database')
-const { userSelect } = require('./main/Model/user')
-const { newLog, getLogs, getLog, updateLog, deleteLog, searchLog } = require('./main/Model/log')
+const { initDatabase } = require('./src/main/Model/init_database')
+const { userSelect } = require('./src/main/Model/user')
+const { newLog, getLogs, getLog, updateLog, deleteLog, searchLog } = require('./src/main/Model/log')
 
-require('electron-reload')(__dirname)
 
 app.whenReady().then( () => { 
     ipcMain.handle('initDatabase', initDatabase)
