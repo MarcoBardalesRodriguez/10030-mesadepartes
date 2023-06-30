@@ -4,21 +4,24 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- <meta
+    <meta
       http-equiv="Content-Security-Policy"
       content="default-src 'self'; script-src 'self'"
-    /> -->
-    <title>Electron app</title>
+    />
+    <title>Demo: Mesa de Partes</title>
+
+    <!-- STYLES AND ICONS -->
+    <!-- Bootstrap4 -->
     <link
       rel="stylesheet"
       href="src/renderer/bootstrap4/cdn.jsdelivr.net_npm_bootstrap@4.0.0_dist_css_bootstrap.min.css"
     />
+    <!-- Fontawesome4 -->
     <link rel="stylesheet" href="src/renderer/fontawesome4/css/font-awesome.min.css" />
-    <!-- <link rel="stylesheet" href="bootswatch/lumen.bootstrap.min.css"> -->
   </head>
   <body>
     <main class="m-4">
-      <!-- Seccion para filtros -->
+      <!-- Search -->
       <section class="flex">
         <div class="input-group md-form form-sm form-1 pl-0">
           <div class="input-group-prepend">
@@ -27,18 +30,18 @@
             ></span>
           </div>
           <input
-            class="form-control my-0 py-1"
-            id="search_input"
             type="text"
-            placeholder="Buscar por fecha o nombres"
+            id="search_input"
+            class="form-control my-0 py-1"
+            placeholder="Buscar registros..."
             aria-label="Search"
           />
         </div>
       </section>
 
-      <!-- Seccion para Form -->
+      <!-- Accordion > Form: New Log -->
       <section
-        class="d-flex flex-column my-4 flex-wrap bg-primary"
+        class="d-flex flex-column my-4 flex-wrap"
         style="border-radius: 5px"
       >
         <div id="accordion">
@@ -57,7 +60,6 @@
                 </button>
               </h5>
             </div>
-
             <div
               id="collapseOne"
               class="collapse show"
@@ -113,7 +115,7 @@
         </div>
       </section>
 
-      <!-- Seccion para tabla -->
+      <!-- Table: Logs -->
       <section
         class="d-flex flex-column my-4 flex-wrap bg-light"
         style="border-radius: 5px"
@@ -137,7 +139,7 @@
       </section>
     </main>
 
-    <!-- Modal -->
+    <!-- Modal > Form: Edit Log -->
     <div
       class="modal fade"
       id="ModalCenter"
@@ -164,7 +166,7 @@
               <div class="from-group">
                 <input
                   type="text"
-                  placeholder="De"
+                  placeholder="Remitente..."
                   id="edit_log_from"
                   class="form-control"
                   required
@@ -173,7 +175,7 @@
               <div class="from-group">
                 <input
                   type="text"
-                  placeholder="Para"
+                  placeholder="Destinatario..."
                   id="edit_log_to"
                   class="form-control"
                   required
@@ -181,7 +183,7 @@
               </div>
               <div class="from-group">
                 <textarea
-                  placeholder="Asunto"
+                  placeholder="Asunto..."
                   name=""
                   id="edit_description"
                   class="form-control"
@@ -206,6 +208,7 @@
       </div>
     </div>
 
+    <!-- SCRIPTS BOOTSTRAP4 -->
     <script src="src/renderer/render.js"></script>
     <script src="src/renderer/bootstrap4/code.jquery.com_jquery-3.2.1.slim.min.js"></script>
     <script src="src/renderer/bootstrap4/cdn.jsdelivr.net_npm_popper.js@1.12.9_dist_umd_popper.min.js"></script>
