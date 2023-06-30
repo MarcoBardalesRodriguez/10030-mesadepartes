@@ -99,8 +99,9 @@ async function deleteLog(_event, id) {
 // function que buscara considencias en el texto de fecha, log_from, log_to y description
 async function searchLog(_event, text) {
     const connection = await conn();
+    // return on order desc
     const stm = await connection.prepare(`
-            SELECT * FROM logs WHERE date LIKE @text OR log_from LIKE @text OR log_to LIKE @text OR description LIKE @text
+            SELECT * FROM logs WHERE date LIKE @text OR log_from LIKE @text OR log_to LIKE @text OR description LIKE @text ORDER BY id DESC
         `);
     stm.bind({
         '@text': `%${text}%`,
