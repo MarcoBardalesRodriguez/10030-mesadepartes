@@ -1,40 +1,22 @@
 {
-  "name": "electron-sql",
+  "name": "demo-mesapartes",
   "version": "1.0.0",
-  "description": "",
+  "description": "Demo: Mesa de Partes -- Electron + SQLite",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "postinstall": "electron-builder install-app-deps",
-    "build": "electron-packager ."
-  },
-  "build": {
-    "appId": "mesapartes10030",
-    "directories": {
-      "output": "dist"
-    },
-    "win": {
-      "target": "nsis",
-      "icon": "assets/icon.ico"
-    },
-    "nsis": {
-      "oneClick": false,
-      "perMachine": true,
-      "allowToChangeInstallationDirectory": true
-    }
+    "build": "electron-packager . demo-mesapartes --platform=win32 --arch=x64 --electron-version=25.2.0 --overwrite --icon=assets/icon.ico --prune=true --out=release-builds"
   },
   "keywords": [],
-  "author": "",
+  "author": "Marco Antonio Bardales Rodriguez",
   "license": "ISC",
   "dependencies": {
-    "sqlite": "^4.2.1",
-    "sqlite3": "^5.1.6"
+    "sqlite": "4.2.1",
+    "sqlite3": "5.1.6"
   },
   "devDependencies": {
-    "electron": "^25.2.0",
-    "electron-builder": "^24.4.0",
-    "electron-packager": "^17.1.1",
+    "electron": "25.2.0",
+    "electron-packager": "17.1.1",
     "electron-reload": "^2.0.0-alpha.1"
   }
 }
