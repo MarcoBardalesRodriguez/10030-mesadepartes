@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'"
+    /> -->
+    <title>Electron app</title>
+    <link
+      rel="stylesheet"
+      href="bootstrap4/cdn.jsdelivr.net_npm_bootstrap@4.0.0_dist_css_bootstrap.min.css"
+    />
+    <link rel="stylesheet" href="fontawesome4/css/font-awesome.min.css" />
+    <!-- <link rel="stylesheet" href="bootswatch/lumen.bootstrap.min.css"> -->
+  </head>
+  <body>
+    <main class="m-4">
+      <!-- Seccion para filtros -->
+      <section class="flex">
+        <div class="input-group md-form form-sm form-1 pl-0">
+          <div class="input-group-prepend">
+            <span class="input-group-text bg-dark"
+              ><i class="fa fa-search text-white" aria-hidden="true"></i
+            ></span>
+          </div>
+          <input
+            class="form-control my-0 py-1"
+            id="search_input"
+            type="text"
+            placeholder="Buscar por fecha o nombres"
+            aria-label="Search"
+          />
+        </div>
+      </section>
+
+      <!-- Seccion para Form -->
+      <section
+        class="d-flex flex-column my-4 flex-wrap bg-primary"
+        style="border-radius: 5px"
+      >
+        <div id="accordion">
+          <div class="card">
+            <div class="card-header" id="headingOne">
+              <h5 class="mb-0">
+                <button
+                  class="btn btn-block"
+                  data-toggle="collapse"
+                  data-target="#collapseOne"
+                  aria-expanded="true"
+                  aria-controls="collapseOne"
+                >
+                  <i class="fa fa-angle-double-down" aria-hidden="true"> </i>
+                  Ingresar Nuevo Registro
+                </button>
+              </h5>
+            </div>
+
+            <div
+              id="collapseOne"
+              class="collapse show"
+              aria-labelledby="headingOne"
+              data-parent="#accordion"
+            >
+              <div class="card-body">
+                <form
+                  id="log_form"
+                  class="form-row text-white"
+                  style="font-size: 1.2rem"
+                >
+                  <div class="from-group col-md-5 mb-1">
+                    <label for="log_from">Nombre del Remitente</label>
+                    <input
+                      type="text"
+                      placeholder="De"
+                      name="log_from"
+                      id="log_from"
+                      class="form-control mb-1"
+                      required
+                    />
+                    <label for="log_to">Nombre del Destinatario</label>
+                    <input
+                      type="text"
+                      placeholder="Para"
+                      name="log_to"
+                      id="log_to"
+                      class="form-control"
+                      required
+                    />
+                  </div>
+                  <div class="from-group col-md-7 mb-1">
+                    <label for="log_description">Asunto</label>
+                    <textarea
+                      placeholder="Asunto del registro"
+                      name="log_description"
+                      id="description"
+                      class="form-control"
+                      rows="4"
+                      style="resize: none"
+                    ></textarea>
+                  </div>
+                  <div class="d-flex my-4 px-1">
+                    <button type="submit" class="btn btn-dark">
+                      Agregar Registro
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Seccion para tabla -->
+      <section
+        class="d-flex flex-column my-4 flex-wrap bg-light"
+        style="border-radius: 5px"
+      >
+        <table class="table" id="logs_table" style="width: 100%">
+          <thead class="thead-dark">
+            <tr>
+              <th>ID</th>
+              <th>Fecha</th>
+              <th>Remitente</th>
+              <th>Destinatario</th>
+              <th>Asunto</th>
+              <th colspan="2">Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="logs_list"></tbody>
+        </table>
+        <button class="btn btn-secondary" id="btn_show_more">
+          Cargar mas registros
+        </button>
+      </section>
+    </main>
+
+    <!-- Modal -->
+    <div
+      class="modal fade"
+      id="ModalCenter"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="exampleModalCenterTitle"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header bg-dark text-white">
+            <h5 class="modal-title" id="exampleModalLongTitle">Editar Registro</h5>
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true" class="text-white">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form id="edit_log_form" class="d-flex flex-column flex-wrap" style="gap: 10px">
+              <div class="from-group">
+                <input
+                  type="text"
+                  placeholder="De"
+                  id="edit_log_from"
+                  class="form-control"
+                  required
+                />
+              </div>
+              <div class="from-group">
+                <input
+                  type="text"
+                  placeholder="Para"
+                  id="edit_log_to"
+                  class="form-control"
+                  required
+                />
+              </div>
+              <div class="from-group">
+                <textarea
+                  placeholder="Asunto"
+                  name=""
+                  id="edit_description"
+                  class="form-control"
+                  rows="4"
+                ></textarea>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-dismiss="modal"
+            >
+              Cancelar
+            </button>
+            <button id="btn_save_changes" type="button" class="btn btn-dark">
+              Guardar cambios
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="render.js"></script>
+    <script src="bootstrap4/code.jquery.com_jquery-3.2.1.slim.min.js"></script>
+    <script src="bootstrap4/cdn.jsdelivr.net_npm_popper.js@1.12.9_dist_umd_popper.min.js"></script>
+    <script src="bootstrap4/cdn.jsdelivr.net_npm_bootstrap@4.0.0_dist_js_bootstrap.min.js"></script>
+  </body>
+</html>

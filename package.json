@@ -1,0 +1,25 @@
+{
+  "name": "electron-sql",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "electron": "^25.2.0",
+    "electron-reload": "^2.0.0-alpha.1",
+    "mysql2": "^3.4.2",
+    "promise-mysql": "^5.2.0",
+    "sqlite": "^4.2.1",
+    "sqlite3": "^5.1.6"
+  },
+  "devDependencies": {
+    "electron-builder": "^24.4.0"
+  }
+}
