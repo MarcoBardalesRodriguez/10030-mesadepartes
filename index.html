@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
   <head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta
+    <!-- <meta
       http-equiv="Content-Security-Policy"
       content="default-src 'self'; script-src 'self'"
-    />
+    /> -->
     <title>Demo: Mesa de Partes</title>
 
     <!-- STYLES AND ICONS -->
@@ -62,13 +62,13 @@
             </div>
             <div
               id="collapseOne"
-              class="collapse show"
+              class="collapse"
               aria-labelledby="headingOne"
               data-parent="#accordion"
             >
               <div class="card-body">
                 <form
-                  id="log_form"
+                  id="form_new_log"
                   class="form-row text-white"
                   style="font-size: 1.2rem"
                 >
@@ -78,7 +78,7 @@
                       type="text"
                       placeholder="De"
                       name="log_from"
-                      id="log_from"
+                      id="inp_from"
                       class="form-control mb-1"
                       required
                     />
@@ -87,7 +87,7 @@
                       type="text"
                       placeholder="Para"
                       name="log_to"
-                      id="log_to"
+                      id="inp_to"
                       class="form-control"
                       required
                     />
@@ -97,7 +97,7 @@
                     <textarea
                       placeholder="Asunto del registro"
                       name="log_description"
-                      id="description"
+                      id="inp_description"
                       class="form-control"
                       rows="4"
                       style="resize: none"
@@ -131,7 +131,7 @@
               <th colspan="2">Acciones</th>
             </tr>
           </thead>
-          <tbody id="logs_list"></tbody>
+          <tbody id="container_logs"></tbody>
         </table>
         <button class="btn btn-secondary" id="btn_show_more">
           Cargar mas registros
@@ -162,12 +162,16 @@
             </button>
           </div>
           <div class="modal-body">
-            <form id="edit_log_form" class="d-flex flex-column flex-wrap" style="gap: 10px">
+            <form 
+              id="form_edit_log" 
+              class="d-flex flex-column flex-wrap" 
+              style="gap: 10px"
+            >
               <div class="from-group">
                 <input
                   type="text"
                   placeholder="Remitente..."
-                  id="edit_log_from"
+                  id="inp_edit_from"
                   class="form-control"
                   required
                 />
@@ -176,7 +180,7 @@
                 <input
                   type="text"
                   placeholder="Destinatario..."
-                  id="edit_log_to"
+                  id="inp_edit_to"
                   class="form-control"
                   required
                 />
@@ -185,7 +189,7 @@
                 <textarea
                   placeholder="Asunto..."
                   name=""
-                  id="edit_description"
+                  id="inp_edit_description"
                   class="form-control"
                   rows="4"
                 ></textarea>

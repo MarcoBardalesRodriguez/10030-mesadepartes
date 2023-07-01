@@ -1,13 +1,23 @@
 const $ = (id) => document.getElementById(id) // shortcut for document.getElementById
 
+// EVENTS ON DOM CONTENT LOADED
+// document.addEventListener('DOMContentLoaded', () => {
+window.electronAPI.initDatabase()
+    .then(() => console.log('database initialized successfuly'))
+    .catch((error) => console.log(error))
+
+const containerLogs = $('container_logs') // container where the logs will be rendered
+
 // FUNCTIONS 
 
-function renderLogs(logs) { // function to render logs in a body of a table
-    const logs_list = $('logs_list')
-    logs.forEach(log => {
+async function renderLogs(logs, container) {
+    // function to render logs in a html element
+    // @logs: array of logs
+    // @container: html element where the logs will be rendered
+    await logs.forEach(log => {
         const tr = document.createElement('tr')
         tr.innerHTML = `
-            <td>${log.id}</td>
+            <td>2023-${log.id}</td>
             <td>${log.date}</td>
             <td>${log.log_from}</td>
             <td>${log.log_to}</td>
@@ -20,212 +30,213 @@ function renderLogs(logs) { // function to render logs in a body of a table
                 type="button"
                 data-toggle="modal"
                 data-target="#ModalCenter"
-                >Edit</button>
+                >Editar</button>
             </td>
             <td>
                 <button 
                 class="btn btn-danger btn-sm" 
-                id="btn_delete_log_${log.id}"
                 onclick="deleteLog(event)"
                 data-identifier="${log.id}"
-                >Delete</button>
+                >Borrar</button>
             </td>
         `
-        logs_list.appendChild(tr)
+        container.appendChild(tr)
     })
 }
 
-async function renderNextLogs(start, step) {
+async function renderOnLoadedDOM(container) {
+    // function to render logs when the DOM is loaded
+    // @container: html element where the logs will be rendered
+    let newLogs = await window.electronAPI.logGetWithLimit(0, 10)
+    container.innerHTML = ''
+    console.log('container cleared')
+    await renderLogs(newLogs, container)
+    start = 10 // start index for the next logs
+}
+async function renderNextLogs(start, step, container) {
+    // function to render more logs in a html element
+    // @start: start index
+    // @step: number of logs to get
+    // @container: html element where the logs will be rendered
     let newLogs = await window.electronAPI.logGetWithLimit(start, step);
-    renderLogs(newLogs);
+    await renderLogs(newLogs, container);
+}
+
+async function renderSearchResults(search, container) {
+    // function to render search results in a html element
+    // @search: search string
+    // @container: html element where the logs will be rendered
+    let resultLogs = await window.electronAPI.logSearch(search);
+    container.innerHTML = ''
+    console.log('container cleared')
+    await renderLogs(resultLogs, container)
+}
+
+function reloadAndFocusTable() {
+    location.hash = '#container_logs'
+    location.reload()
 }
 
 
-// EVENTS ON DOM CONTENT LOADED
-document.addEventListener('DOMContentLoaded', async () => {
-    await window.electronAPI.initDatabase() // function to initialize the database
 
-    // GET FIRST 10 LOGS AND RENDER IN TABLE
-    const logs = await window.electronAPI.logGetWithLimit(0, 10)
-    renderLogs(logs)
-
-    // GET AND RENDER MORE LOGS
-    let isLoading = false; // Variable para rastrear si se está cargando actualmente
-    let start = 10
-    const step = 10
-    
-    const btn_show_more = $('btn_show_more')
-    btn_show_more.addEventListener('click', async () => {
-        if (isLoading) {
-        return; // Si ya se está cargando, no hacer nada
-        }
-    
-        isLoading = true; // Marcar como carga en progreso
-        btn_show_more.disabled = true; // Deshabilitar el botón durante la carga
-    
-        await renderNextLogs(start, step) // Cargar más registros
-        start = start + step; // Incrementar el valor de inicio para la próxima carga
-    
-        isLoading = false; // Marcar como carga completa
-        btn_show_more.disabled = false; // Habilitar el botón nuevamente
-    })
-})
-
-// EVENTS ON FORM SUBMIT
-const newLogForm = $('log_form') // get the main form
-//inputs
-const logFrom = $('log_from')
-const logTo = $('log_to')
-const description = $('description')
-
-newLogForm.addEventListener('submit', async (e) => {
-    e.preventDefault()
-    const log = { // create a log object
-        log_from: logFrom.value,
-        log_to: logTo.value,
-        description: description.value
-    }
-
-    try { // try to save the log
-        await window.electronAPI.logNew(log)
-        alert('Log saved!')
-        await location.reload() // reload the page to see the new log
-    } catch (error) {
-        alert('Error saving log')
-    }
-    
+// GET FIRST LOGS AND RENDER IN TABLE
+document.addEventListener('DOMContentLoaded', () => {
+    renderOnLoadedDOM(containerLogs)
+        .then(() => console.log('logs rendered successfuly'))
+        .catch((error) => console.log(error))
 })
 
 
-// EVENTS ON EDIT BUTTON CLICK 
-const edit_newLogForm = $('edit_log_form') // get the edit form
-// edit inputs
-const edit_logFrom = $('edit_log_from')
-const edit_logTo = $('edit_log_to')
-const edit_description = $('edit_description')
-// edit btn
-const btn_save_changes = $('btn_save_changes')
-
-async function editLog(e) {
-  const identifier = e.target.dataset.identifier
-  console.log(identifier)
-
-  // get the log to edit and fill the inputs
-  let log = await window.electronAPI.logGet(identifier)
-  edit_logFrom.value = log.log_from
-  edit_logTo.value = log.log_to
-  edit_description.value = log.description
-  //set the identifier to the save changes button
-  btn_save_changes.dataset.identifier = identifier
-}
-
-btn_save_changes.addEventListener('click', async () => {
-  const identifier = btn_save_changes.dataset.identifier
-  const log = {
-    id: identifier,
-    log_from: edit_logFrom.value,
-    log_to: edit_logTo.value,
-    description: edit_description.value
-  }
-  try {
-    // try to update the log
-    await window.electronAPI.logUpdate(log)
-    alert('Log saved!')
-    await location.reload() // reload the page to see the updated log
-  } catch (error) {
-    alert('Error saving log')
-  }
-});
-
-
-// EVENTS ON DELETE BUTTON CLICK
-async function deleteLog(e) {
-    const identifier = e.target.dataset.identifier
-    try {
-        // try to delete the log
-        await window.electronAPI.logDelete(identifier)
-        alert('Log deleted!')
-        await location.reload() // reload the page to see the updated log
-    } catch (error) {
-        alert('Error deleting log')
-    }
-}
-
-
-// EVENTS ON SEARCH FORM SUBMIT
+// SEARCH LOGS
 const searchInput = document.getElementById('search_input');
-const resultsTableBody = document.getElementById('logs_list');
-
 let searchTimeout;
 
-// Función de búsqueda que retorna una lista de registros coincidentes
-async function searchRecords(text) {
-  // Lógica de búsqueda y obtención de registros desde la base de datos
-  const results = await window.electronAPI.logSearch(text)
-  return results;
-}
-
-// Función para actualizar la tabla con los resultados de búsqueda
-function updateTable(logs) {
-  // Limpiar la tabla
-  resultsTableBody.innerHTML = '';
-
-  // Iterar sobre los resultados y agregar filas a la tabla
-  logs.forEach(log => {
-    const tr = document.createElement('tr')
-        tr.innerHTML = `
-            <td>${log.id}</td>
-            <td>${log.date}</td>
-            <td>${log.log_from}</td>
-            <td>${log.log_to}</td>
-            <td>${log.description}</td>
-            <td>
-                <button 
-                class="btn btn-warning btn-sm" 
-                onclick="editLog(event)" 
-                data-identifier="${log.id}"
-                type="button"
-                data-toggle="modal"
-                data-target="#ModalCenter"
-                >Edit</button>
-            </td>
-            <td>
-                <button 
-                class="btn btn-danger btn-sm" 
-                id="btn_delete_log_${log.id}"
-                onclick="deleteLog(event)"
-                data-identifier="${log.id}"
-                >Delete</button>
-            </td>
-        `
-        logs_list.appendChild(tr)
-    })
-}
-
-// Manejador del evento input en el input de búsqueda
 searchInput.addEventListener('input', () => {
-  // Limpiar el timeout anterior (si existe) para evitar búsquedas innecesarias
-  clearTimeout(searchTimeout);
+    // Limpiar el timeout anterior (si existe) para evitar búsquedas innecesarias
+    clearTimeout(searchTimeout)
 
-  // Obtener el texto del input de búsqueda
-  const searchText = searchInput.value;
+    const searchText = searchInput.value // Obtener el texto del input de búsqueda
+    console.log(searchText)
 
-  // Establecer un nuevo timeout para retrasar la búsqueda
-  searchTimeout = setTimeout(async () => {
-    console.log('input')
-    // Realizar la búsqueda y obtener los resultados
-    const searchResults = await searchRecords(searchText);
+    // Establecer un nuevo timeout para retrasar la búsqueda
+    searchTimeout = setTimeout(() => {
+        console.log(searchText)
 
-    // Comprobar si el input está vacío
-    if (searchText === '') {
-        // Ejecutar la función cuando el input esté vacío
-        const logs = await window.electronAPI.logGetWithLimit(0, 10)
-        resultsTableBody.innerHTML = '';
-        renderLogs(logs)
-    }else{
-        // Actualizar la tabla con los resultados
-        updateTable(searchResults);
-    }
-  }, 500); // Esperar 500 ms antes de realizar la búsqueda (ajusta este valor según tus necesidades)
+        // Comprobar si el input está vacío
+        if (searchText === '') {
+            renderOnLoadedDOM(containerLogs)
+                .then(() => {
+                    console.log('logs rendered successfuly')
+                    btnShowMore.disabled = false; // Habilitar el botón nuevamente
+                })
+                .catch((error) => {
+                    console.log(error)
+                    btnShowMore.disabled = false; // Habilitar el botón nuevamente
+                })
+        } else {
+            renderSearchResults(searchText, containerLogs)
+                .then(() => {
+                    console.log('logs rendered successfuly')
+                    btnShowMore.disabled = true; // Deshabilitar el botón durante las busquedas
+                })
+                .catch((error) => {
+                    console.log(error)
+                    btnShowMore.disabled = true; // Deshabilitar el botón durante las busquedas
+                })
+        }
+    }, 500); // Esperar 500 ms antes de realizar la búsqueda 
 });
+
+
+// SAVE NEW LOG
+const formNewLog = $('form_new_log') // get the main form
+//inputs
+const inpFrom = $('inp_from')
+const inpTo = $('inp_to')
+const inpDescription = $('inp_description')
+
+formNewLog.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const log = {
+        log_from: inpFrom.value,
+        log_to: inpTo.value,
+        description: inpDescription.value
+    };
+
+    try {
+        await window.electronAPI.logNew(log);
+        console.log('log saved successfully');
+        // alert('Log saved!');
+        reloadAndFocusTable()
+    } catch (error) {
+        console.log(error);
+    }
+});
+
+
+// EDIT LOG
+const formEditLog = $('form_edit_log') // get the edit form
+// edit inputs
+const inpEditFrom = $('inp_edit_from')
+const inpEditTo = $('inp_edit_to')
+const inpEditDescription = $('inp_edit_description')
+const btnSaveChanges = $('btn_save_changes') // button to save changes
+
+function editLog(e) {
+    // function que obtiene el log a editar, llena los inputs
+    // y asigna el id al botón de guardar cambios
+    // @e: event
+    const identifier = e.target.dataset.identifier
+    console.log(identifier)
+
+    window.electronAPI.logGet(identifier)
+        .then((log) => {
+            console.log(inpEditFrom.value)
+            inpEditFrom.value = log.log_from
+            inpEditTo.value = log.log_to
+            inpEditDescription.value = log.description
+            btnSaveChanges.dataset.identifier = identifier
+        })
+        .catch((error) => console.log(error))
+}
+
+btnSaveChanges.addEventListener('click', () => {
+    const identifier = btnSaveChanges.dataset.identifier
+    console.log(identifier)
+    const log = {
+        id: identifier,
+        log_from: inpEditFrom.value,
+        log_to: inpEditTo.value,
+        description: inpEditDescription.value
+    }
+    window.electronAPI.logUpdate(log)
+        .then(() => {
+            console.log('log updated successfuly')
+            reloadAndFocusTable()
+        })
+        .catch((error) => console.log(error))
+})
+
+
+// DELETE LOG
+function deleteLog(e) {
+    const identifier = e.target.dataset.identifier;
+    window.electronAPI.logDelete(identifier)
+        .then(() => {
+            console.log('log deleted successfully');
+            reloadAndFocusTable()
+        })
+        .catch((error) => {
+            console.log(error);
+        });
+}
+
+
+// RENDER MORE LOGS
+const btnShowMore = $('btn_show_more') // button to show more logs
+
+let isLoading = false; // Variable para rastrear si se está cargando actualmente
+let start = 10
+const step = 10
+
+btnShowMore.addEventListener('click', () => {
+    if (isLoading) return; // Si ya se está cargando, no hacer nada
+
+    // Si no se está cargando
+    isLoading = true; // Marcar como carga en progreso
+    btnShowMore.disabled = true; // Deshabilitar el botón durante la carga
+
+    renderNextLogs(start, step, containerLogs)
+        .then(() => {
+            console.log('logs rendered successfuly')
+            start = start + step; // Incrementar el valor de inicio para la próxima carga
+            isLoading = false; // Marcar como carga completa
+            btnShowMore.disabled = false; // Habilitar el botón nuevamente
+        })
+        .catch((error) => {
+            console.log(error)
+            isLoading = false; // Marcar como carga completa
+            btnShowMore.disabled = false; // Habilitar el botón nuevamente
+        })
+})
 
