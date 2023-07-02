@@ -9,6 +9,7 @@
   },
   "keywords": [],
   "author": "Marco Antonio Bardales Rodriguez",
+  "company": "IE10030 - Naylamp",
   "license": "ISC",
   "dependencies": {
     "sqlite": "4.2.1",
