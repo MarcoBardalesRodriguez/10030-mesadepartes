@@ -17,7 +17,7 @@ async function renderLogs(logs, container) {
     await logs.forEach(log => {
         const tr = document.createElement('tr')
         tr.innerHTML = `
-            <td>2023-${log.id}</td>
+            <td>${log.id}</td>
             <td>${log.date}</td>
             <td>${log.log_from}</td>
             <td>${log.log_to}</td>
