@@ -1,11 +1,11 @@
 {
   "name": "demo-mesapartes",
-  "version": "1.0.0",
-  "description": "Demo: Mesa de Partes -- Electron + SQLite",
+  "version": "1.1.0",
+  "description": "Mesa de Partes v1.1",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "build": "electron-packager . demo-mesapartes --platform=win32 --arch=x64 --electron-version=25.2.0 --overwrite --icon=assets/open-book.png --prune=true --out=release-builds"
+    "build": "electron-packager . 10030-mesadepartes --platform=win32 --arch=x64 --electron-version=25.2.0 --overwrite --icon=assets/open-book.png --prune=true --out=release-builds"
   },
   "keywords": [],
   "author": "Marco Antonio Bardales Rodriguez",
